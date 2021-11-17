@@ -4,3 +4,11 @@ __pycache__
 .hypothesis/
 build/
 reports/
+
+#Hardhat files
+node_modules
+coverage
+coverage.json
+typechain
+cache
+artifacts

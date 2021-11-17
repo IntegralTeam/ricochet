@@ -19,7 +19,7 @@ const deployTestToken = require('@superfluid-finance/ethereum-contracts/scripts/
 const deploySuperToken = require('@superfluid-finance/ethereum-contracts/scripts/deploy-super-token');
 const SuperfluidSDK = require('@superfluid-finance/js-sdk');
 const traveler = require('ganache-time-traveler');
-const SuperfluidGovernanceBase = require('./artifacts/superfluid/SuperfluidGovernanceII.json');
+const SuperfluidGovernanceBase = require('./artifacts_superfluid/superfluid/SuperfluidGovernanceII.json');
 
 const TEST_TRAVEL_TIME = 3600 * 2; // 1 hours
 

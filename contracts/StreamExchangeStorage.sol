@@ -18,7 +18,7 @@ import {
     IInstantDistributionAgreementV1
 } from "@superfluid-finance/ethereum-contracts/contracts/interfaces/agreements/IInstantDistributionAgreementV1.sol";
 
-import '@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol';
+import './interfaces/IUniswapV2Router02.sol';
 
 import "./tellor/ITellor.sol";
 
@@ -39,7 +39,7 @@ library StreamExchangeStorage  {
   /// @param outputIndexId
   /// @param subsidyToken The token to use as the subsidy
   /// @param subsidyRate The number of tokens to distribute subsidy in units per second
-  /// @param subsidyIndexId 
+  /// @param subsidyIndexId
   /// @param lastDistributionAt The last time a distribution was made
   /// @param sushiRouter Address of sushsiwap router
   /// @param oracle Address of deployed simple oracle for input/output token
