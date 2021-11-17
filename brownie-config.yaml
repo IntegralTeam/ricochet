@@ -5,7 +5,7 @@ networks:
 
   rinkeby:
     host: https://rinkeby.infura.io/v3/${INFURA_KEY}
-    accounts: [MATIC_PRIVATE_KEY]
+    accounts: [RINKEBY_PRIVATE_KEY]
     gas_limit: 2000000
     gas_price: 20000000000
 
@@ -31,7 +31,7 @@ networks:
       chain_id: 1337
       network_id: 1588949648
       evm_version: istanbul
-      fork: https://mainnet.infura.io/v3/29b8e685756646c8a1aa06c3f752e26b
+      fork: https://mainnet.infura.io/v3/${INFURA_KEY}
       mnemonic: [MNEMONIC]
       block_time: 0
       default_balance: 100
@@ -43,7 +43,7 @@ etherscan:
 dependencies:
     - OpenZeppelin/openzeppelin-contracts@4.0.0
     - OpenZeppelin/openzeppelin-test-helpers@0.5.13
-    - superfluid-finance/ethereum-contracts@0.1.1
+    - superfluid-finance/ethereum-contracts@0.1.2
     - Uniswap/v2-periphery@1.0.0-beta.0
     - Uniswap/v2-core@1.0.1
 
@@ -53,6 +53,6 @@ compiler:
       remappings:
         - "@openzeppelin/contracts=OpenZeppelin/openzeppelin-contracts@4.0.0/contracts/"
         - "@openzeppelin/test-helpers=OpenZeppelin/openzeppelin-test-helpers@0.5.13"
-        - "@superfluid-finance/ethereum-contracts=superfluid-finance/ethereum-contracts@0.1.1"
+        - "@superfluid-finance/ethereum-contracts=superfluid-finance/ethereum-contracts@0.1.2"
         - "@uniswap/v2-periphery=Uniswap/v2-periphery@1.0.0-beta.0"
         - "@uniswap/v2-core=Uniswap/v2-core@1.0.1"
