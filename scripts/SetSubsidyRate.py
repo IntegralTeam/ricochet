@@ -1,16 +1,16 @@
 import json
-from brownie import accounts
+from brownie import accounts, StreamExchange
 
 def main():
-    with open('scripts\jsonArgs\SetSubsidyRateArgs.json', 'r') as parser:
-        parseArgs = json.load(parser)
+    with open('.\jsonArgs\SetSubsidyRateArgs.json', 'r') as parser:
+        parse_args = json.load(parser)
 
-    StreamExchangeInstance = StreamExchange.at(parseArgs['address'])
+    stream_exchange_instance = StreamExchange.at(parse_args['address'])
 
     try:
-        print('Current subsidy rate: %s', StreamExchangeInstance.getSubsidyRate('from': accounts[0]))
-        print('Setting subsidy rate to: %s...', parseArgs['rate'])
-        StreamExchangeInstance.setSubsidyRate(parseArgs['rate'], 'from': accounts[0])
-        print('Subsidy rate set to %s', StreamExchangeInstance.getSubsidyRate('from': accounts[0]))
+        print('Current subsidy rate: %s', stream_exchange_instance.getSubsidyRate({'from': accounts[0]}))
+        print('Setting subsidy rate to: %s...', parse_args['rate'])
+        stream_exchange_instance.setSubsidyRate(parse_args['rate'], {'from': accounts[0]})
+        print('Subsidy rate set to %s', stream_exchange_instance.getSubsidyRate({'from': accounts[0]}))
     except Exception as error:
-        print('Error for StreamExchange contract at %s: %s', StreamExchangeInstance.address, error)
+        print('Error for StreamExchange contract at %s: %s', stream_exchange_instance.address, error)
