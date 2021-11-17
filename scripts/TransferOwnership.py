@@ -1,15 +1,15 @@
 import json
-from brownie import accounts
+from brownie import accounts, StreamExchange
 
 def main():
-    with open('scripts\jsonArgs\TransferOwnershipArgs.json', 'r') as parser:
-        parseArgs = json.load(parser)
+    with open('.\jsonArgs\TransferOwnershipArgs.json', 'r') as parser:
+        parse_args = json.load(parser)
 
-    StreamExchangeInstance = StreamExchange.at(parseArgs['address'])
+    stream_exchange_instance = StreamExchange.at(parse_args['address'])
 
     try:
-        print('Current owner: %s', StreamExchangeInstance.owner('from': accounts[0]))
-        StreamExchangeInstance.transferOwnership(parseArgs['owner'], 'from': accounts[0])
-        print('New owner: %s',  StreamExchangeInstance.owner('from': accounts[0]))
+        print('Current owner: %s', stream_exchange_instance.owner({'from': accounts[0]}))
+        stream_exchange_instance.transferOwnership(parse_args['owner'], {'from': accounts[0]})
+        print('New owner: %s',  stream_exchange_instance.owner({'from': accounts[0]}))
     except Exception as error:
-        print('Error for StreamExchange contract at %s: %s', StreamExchangeInstance.address, error)
+        print('Error for StreamExchange contract at %s: %s', stream_exchange_instance.address, error)
