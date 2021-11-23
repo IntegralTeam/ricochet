@@ -8,7 +8,7 @@ IDA_ADDRESS = "0xB0aABBA4B2783A72C52956CDEF62d438ecA2d7a1"
 RIC_CONTRACT_ADDRESS = "0x263026e7e53dbfdce5ae55ade22493f828922965"
 
 def main():
-    with open('.\jsonArgs\DeployPolygonArgs.json', 'r') as parser:
+    with open('scripts\jsonArgs\DeployPolygonArgs.json', 'r') as parser:
         parse_args = json.load(parser)
 
     stream_exchange_helper_instance = StreamExchangeHelper.deploy({'from': accounts[0]})
