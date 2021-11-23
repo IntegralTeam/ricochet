@@ -2,24 +2,23 @@ import subprocess
 import os
 
 
-def deploy_hardhat_test():
-    if not os.path.isdir("./ricochet-hardhat/copied_contracts"):
+def test_deploy_hardhat():
+    if not os.path.isdir(".\\ricochet-hardhat\\copied_contracts"):
         subprocess.run([
-            "mkdir", "./ricochet-hardhat/copied_contracts"
-        ], stdout=subprocess.STDOUT, capture_output=True)
-
+            "mkdir", ".\\ricochet-hardhat\\copied_contracts"
+        ])
+    print('1')
     subprocess.run([
-        "cp", "-a", "./contracts", "./ricochet-hardhat/copied_contracts"
-    ], stdout=subprocess.STDOUT, capture_output=True)
-
+        "xcopy", ".\\contracts\\*", ".\\ricochet-hardhat\\copied_contracts\\", "/s", "/e",
+    ])
+    print('2')
+    subprocess.run(["cd", ".\\ricochet-hardhat\\"])
+    print('3')
+    subprocess.run(["yarn", "hardhat", "test"])
+    print('4')
+    subprocess.run(["cd", ".."])
+    print('5')
     subprocess.run([
-        "cd", "./ricochet-hardhat",
-        "&&",
-        "npx", "hardhat", "test",
-        "&&",
-        "cd", ".."
-    ], stdout=subprocess.STDOUT, capture_output=True)
-
-    subprocess.run([
-        "rm", "-rf", "./ricochet-hardhat/copied_contracts"
-    ], stdout=subprocess.STDOUT, capture_output=True)
+        "rd", "/s", "/q", ".\\ricochet-hardhat\\copied_contracts\\"
+    ])
+    assert True

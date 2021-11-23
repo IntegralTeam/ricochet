@@ -19,7 +19,7 @@ networks:
   development:
     gas_limit: max
     gas_buffer: 1
-    gas_price: 0
+    gas_price: 80000
     max_fee: null
     priority_fee: null
     reverting_tx_gas_limit: max
@@ -28,31 +28,20 @@ networks:
       port: 8545
       gas_limit: 6721975
       accounts: 10
-      chain_id: 1337
-      network_id: 1588949648
       evm_version: istanbul
-      fork: https://mainnet.infura.io/v3/${INFURA_KEY}
-      mnemonic: [MNEMONIC]
-      block_time: 0
-      default_balance: 100
-      unlock: null
+      host: https://127.0.0.1
+      mnemonic: MNEMONIC
+     
 
 etherscan:
-  apiKey: [ETHERSCAN_API_KEY]
+  apiKey: ETHERSCAN_API_KEY
 
-dependencies:
-    - OpenZeppelin/openzeppelin-contracts@4.0.0
-    - OpenZeppelin/openzeppelin-test-helpers@0.5.13
-    - superfluid-finance/protocol-monorepo@ethereum-contracts@1.0.0-rc.7
-    - Uniswap/v2-periphery@1.0.0-beta.0
-    - Uniswap/v2-core@1.0.1
 
 compiler:
     solc:
       version: 0.8.3
       remappings:
-        - "@openzeppelin/contracts=OpenZeppelin/openzeppelin-contracts@4.0.0/contracts/"
-        - "@openzeppelin/test-helpers=OpenZeppelin/openzeppelin-test-helpers@0.5.13"
-        - "@superfluid-finance/ethereum-contracts=superfluid-finance/protocol-monorepo@ethereum-contracts@1.0.0-rc.7"
-        - "@uniswap/v2-periphery=Uniswap/v2-periphery@1.0.0-beta.0"
-        - "@uniswap/v2-core=Uniswap/v2-core@1.0.1"
+        - "@openzeppelin=./modules/OpenZeppelin/openzeppelin-contracts@4.0.0"
+        - "@superfluid-finance/ethereum-contracts=./modules/superfluid-finance/ethereum-contracts"
+        - "@uniswap/v2-periphery=./modules/Uniswap/v2-periphery@1.1.0-beta.0"
+        - "@uniswap/v2-core=./modules/Uniswap/v2-core@1.0.1"

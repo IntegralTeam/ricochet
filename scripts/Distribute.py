@@ -2,10 +2,10 @@ import json
 from brownie import accounts, StreamExchange
 
 def main():
-    with open('.\jsonArgs\DistributeArgs.json', 'r') as parser:
-        parseArgs = json.load(parser)
+    with open('scripts\jsonArgs\DistributeArgs.json', 'r') as parser:
+        parse_args = json.load(parser)
 
-    stream_exchange_instance = StreamExchange.at(parseArgs['address'])
+    stream_exchange_instance = StreamExchange.at(parse_args['address'])
 
     try:
         print('Executing distribute function for StreamExchange contract at ', stream_exchange_instance.address,'...')

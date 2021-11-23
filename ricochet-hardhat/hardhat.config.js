@@ -4,6 +4,7 @@ require('@nomiclabs/hardhat-ethers');
 require('@openzeppelin/hardhat-upgrades');
 require('hardhat-contract-sizer');
 require('@nomiclabs/hardhat-etherscan');
+require("@nomiclabs/hardhat-ganache");
 require('solidity-coverage');
 require('dotenv').config();
 
@@ -24,9 +25,12 @@ module.exports = {
     timeout: 1e6,
   },
   networks: {
+    localhost: {
+      url: "http://127.0.0.1:8545"
+    },
     hardhat: {
       forking: {
-        url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_MAINNET_KEY}`,
+        url: `https://polygon-mainnet.g.alchemy.com/v2/iau-uzNuJ7ghda0Qv8fWNr2Rg5pP34ZC`,
       },
     },
   },
