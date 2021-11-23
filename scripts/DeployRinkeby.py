@@ -2,13 +2,13 @@ import json
 from brownie import StreamExchangeHelper, StreamExchange, accounts
 
 
-HOST_ADDRESS = "0x3E14dC1b13c488a8d5D310918780c983bD5982E7"
-CFA_ADDRESS = "0x6EeE6060f715257b970700bc2656De21dEdF074C"
-IDA_ADDRESS = "0xB0aABBA4B2783A72C52956CDEF62d438ecA2d7a1"
-RIC_CONTRACT_ADDRESS = "0x263026e7e53dbfdce5ae55ade22493f828922965"
+HOST_ADDRESS = "0x3D7CD28EfD08FfE9Ce8cA329EC2e67822C756526"
+CFA_ADDRESS = "0xF4C5310E51F6079F601a5fb7120bC72a70b96e2A"
+IDA_ADDRESS = "0x32E0ecb72C1dDD92B007405F8102c1556624264D"
+RIC_CONTRACT_ADDRESS = "0x369A77c1A8A38488cc28C2FaF81D2378B9321D8B"
 
 def main():
-    with open('.\jsonArgs\DeployRinkebyArgs.json', 'r') as parser:
+    with open('scripts\jsonArgs\DeployRinkebyArgs.json', 'r') as parser:
         parse_args = json.load(parser)
 
     stream_exchage_helper_instance = StreamExchangeHelper.deploy({'from': accounts[0]})
