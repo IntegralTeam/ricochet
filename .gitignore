@@ -1,6 +1,14 @@
-*/artifacts
-*/cache
-*/node_modules
+__pycache__
+.env
+.history
+.hypothesis/
+build/
+reports/
 
-*__pycache__
-logs
+#Hardhat files
+node_modules
+coverage
+coverage.json
+typechain
+cache
+artifacts

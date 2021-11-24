@@ -1,6 +1,5 @@
 pragma solidity >=0.7.0;
 
-import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../tellor/UsingTellor.sol";
 
@@ -46,8 +45,6 @@ contract MockUniswapRouter is UsingTellor {
         // amounts = [0, amountIn / _value / 1e6];
         amounts[0] = 0;
         amounts[1] = amountOut;
-        console.log("AmountIn:", amountIn);
-        console.log("AmountOut:", amounts[1]);
 
   }
 
