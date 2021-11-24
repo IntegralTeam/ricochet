@@ -35,7 +35,7 @@ async function impersonateAccount(account) {
 }
 
 async function setBalance(account, balance) {
-  const hexBalance = numberToHex(new BN(balance));
+  const hexBalance = numberToHex(toWad(balance));
   await hre.network.provider.request({
     method: 'hardhat_setBalance',
     params: [
@@ -117,7 +117,7 @@ describe('StreamExchange', () => {
   const TELLOR_REQUEST_ID = 60;
 
   // random address from polygonscan that have a lot of usdcx
-  const USDCX_SOURCE_ADDRESS = '0x853Ee4b2A13f8a742d64C8F088bE7bA2131f670d';
+  const USDCX_SOURCE_ADDRESS = '0x02757cf1281db2f16b08b90636d11db3a5f6d09a';
   const WBTC_SOURCE_ADDRESS = '0x5c2ed810328349100A66B82b78a1791B101C9D61';
   const USDC_SOURCE_ADDRESS = '0x1a13f4ca1d028320a707d99520abfefca3998b7f';
 
@@ -327,13 +327,13 @@ describe('StreamExchange', () => {
       await web3tx(
         usdcx.upgrade,
         `${accounts[i].alias} upgrades many USDCx`,
-      )(new BN(100000000), {
+      )(toWad(100000000), {
         from: accounts[i].address,
       });
       await web3tx(
         daix.upgrade,
         `${accounts[i].alias} upgrades many DAIx`,
-      )(new BN(100000000), {
+      )(toWad(100000000), {
         from: accounts[i].address,
       });
 
@@ -436,7 +436,7 @@ describe('StreamExchange', () => {
   }
 
   describe('Stream Exchange', async () => {
-    xit('should be correctly configured', async () => {
+    it('should be correctly configured', async () => {
       expect(await app.isAppJailed()).to.equal(false);
       expect(await app.getInputToken()).to.equal(usdcx.address);
       expect(await app.getOuputToken()).to.equal(wbtcx.address);
@@ -499,9 +499,9 @@ describe('StreamExchange', () => {
       await approveSubscriptions([u.alice.address, u.bob.address]);
 
       console.log('Transfer alice');
-      await usdcx.transfer(u.alice.address, new BN(400), { from: u.spender.address });
+      await usdcx.transfer(u.alice.address, toWad(400), { from: u.spender.address });
       console.log('Transfer bob');
-      await usdcx.transfer(u.bob.address, new BN(400), { from: u.spender.address });
+      await usdcx.transfer(u.bob.address, toWad(400), { from: u.spender.address });
       console.log('Done');
 
       await checkBalances([u.alice, u.bob]);
@@ -595,7 +595,7 @@ describe('StreamExchange', () => {
       expect(await app.getStreamRate(u.admin.address)).to.equal('0');
     });
 
-    it('should distribute tokens to streamers correctly', async () => {
+    xit('should distribute tokens to streamers correctly', async () => {
       const inflowRate1 = '77160493827160'; // ~200 * 1e18 per month
       const inflowRate2 = '964506172839506'; // ~2500 per month
       const inflowRate3 = '38580246913580'; // ~100 per month
@@ -606,11 +606,11 @@ describe('StreamExchange', () => {
       await approveSubscriptions();
 
       console.log('Transfer bob');
-      await usdcx.transfer(u.bob.address, new BN(400), { from: u.spender.address });
+      await usdcx.transfer(u.bob.address, toWad(400), { from: u.spender.address });
       console.log('Transfer alice');
-      await usdcx.transfer(u.alice.address, new BN(400), { from: u.spender.address });
+      await usdcx.transfer(u.alice.address, toWad(400), { from: u.spender.address });
       console.log('Transfer admin');
-      await usdcx.transfer(u.admin.address, new BN(400), { from: u.spender.address });
+      await usdcx.transfer(u.admin.address, toWad(400), { from: u.spender.address });
       console.log('Done');
 
       await takeMeasurements();
@@ -618,7 +618,7 @@ describe('StreamExchange', () => {
       // Test `closeStream`
       // Try close stream and expect revert
       await expect(
-        u.admin.flow({ flowRate: new BN(10000), recipient: u.app }),
+        u.admin.flow({ flowRate: toWad(10000), recipient: u.app }),
       ).to.be.revertedWith('!enoughTokens');
 
       await u.admin.flow({ flowRate: inflowRate1, recipient: u.app });
