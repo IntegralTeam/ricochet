@@ -4,7 +4,7 @@ import "@openzeppelin/contracts/token/ERC777/IERC777.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 
-contract MockInputSuperToken is ISuperToken {
+contract MockSuperToken is ISuperToken {
  
     address public inputToken;
     address[] mockAddress = [0x1305F6B6Df9Dc47159D12Eb7aC2804d4A33173c2,

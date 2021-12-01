@@ -2,8 +2,6 @@
 const {
   web3tx,
   toWad,
-  wad4human,
-  fromDecimals,
   BN,
 } = require('@decentral.ee/web3-helpers');
 const {
@@ -12,20 +10,11 @@ const {
 const {
   expect,
 } = require('chai');
-const { time } = require('@openzeppelin/test-helpers');
 const axios = require('axios').default;
-const deployFramework = require('@superfluid-finance/ethereum-contracts/scripts/deploy-framework');
-const deployTestToken = require('@superfluid-finance/ethereum-contracts/scripts/deploy-test-token');
-const deploySuperToken = require('@superfluid-finance/ethereum-contracts/scripts/deploy-super-token');
 const SuperfluidSDK = require('@superfluid-finance/js-sdk');
 const traveler = require('ganache-time-traveler');
 const SuperfluidGovernanceBase = require('./artifacts_superfluid/superfluid/SuperfluidGovernanceII.json');
 
-const TEST_TRAVEL_TIME = 3600 * 2; // 1 hours
-
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 
 async function impersonateAccount(account) {
   await hre.network.provider.request({
@@ -80,28 +69,18 @@ async function createSFRegistrationKey(sf, deployer) {
 }
 
 describe('StreamExchange', () => {
-  const errorHandler = (err) => {
-    if (err) throw err;
-  };
-
+  
   const names = ['Admin', 'Alice', 'Bob', 'Carl', 'Spender'];
 
   let sf;
-  let dai;
-  let daix;
   let ethx;
   let wbtc;
   let wbtcx;
-  let usd;
   let usdcx;
   let ric;
   let usdc;
-  let eth;
-  let weth;
   let app;
   let tp; // Tellor playground
-  let usingTellor;
-  let sr; // Mock Sushi Router
   const ricAddress = '0x263026e7e53dbfdce5ae55ade22493f828922965';
   const u = {}; // object with all users
   const aliases = {};
@@ -118,8 +97,6 @@ describe('StreamExchange', () => {
 
   // random address from polygonscan that have a lot of usdcx
   const USDCX_SOURCE_ADDRESS = '0x02757cf1281db2f16b08b90636d11db3a5f6d09a';
-  const WBTC_SOURCE_ADDRESS = '0x5c2ed810328349100A66B82b78a1791B101C9D61';
-  const USDC_SOURCE_ADDRESS = '0x1a13f4ca1d028320a707d99520abfefca3998b7f';
 
   const CARL_ADDRESS = '0x8c3bf3EB2639b2326fF937D041292dA2e79aDBbf';
   const BOB_ADDRESS = '0x00Ce20EC71942B41F50fF566287B811bbef46DC8';
@@ -190,6 +167,8 @@ describe('StreamExchange', () => {
   }
 
   before(async () => {
+    console.log(toWad(400).toString(),'<---------------------------------')
+    console.log(400*10**18)
     // ==============
     // impersonate accounts and set balances
 
@@ -320,86 +299,6 @@ describe('StreamExchange', () => {
     for (let i = 0; i < accounts.length; i += 1) {
       await checkBalance(accounts[i]);
     }
-  }
-
-  async function upgrade(accounts) {
-    for (let i = 0; i < accounts.length; ++i) {
-      await web3tx(
-        usdcx.upgrade,
-        `${accounts[i].alias} upgrades many USDCx`,
-      )(toWad(100000000), {
-        from: accounts[i].address,
-      });
-      await web3tx(
-        daix.upgrade,
-        `${accounts[i].alias} upgrades many DAIx`,
-      )(toWad(100000000), {
-        from: accounts[i].address,
-      });
-
-      await checkBalance(accounts[i]);
-    }
-  }
-
-  async function logUsers() {
-    let string = 'user\t\ttokens\t\tnetflow\n';
-    let p = 0;
-    for (const [, user] of Object.entries(u)) {
-      if (await hasFlows(user)) {
-        p++;
-        string += `${user.alias}\t\t${wad4human(
-          await usdcx.balanceOf(user.address),
-        )}\t\t${wad4human((await user.details()).cfa.netFlow)}
-            `;
-      }
-    }
-    if (p == 0) return console.warn('no users with flows');
-    console.log('User logs:');
-    console.log(string);
-  }
-
-  async function hasFlows(user) {
-    const {
-      inFlows,
-      outFlows,
-    } = (await user.details()).cfa.flows;
-    return inFlows.length + outFlows.length > 0;
-  }
-
-  async function appStatus() {
-    const isApp = await sf.host.isApp(u.app.address);
-    const isJailed = await sf.host.isAppJailed(app.address);
-    !isApp && console.error('App is not an App');
-    isJailed && console.error('app is Jailed');
-    await checkBalance(u.app);
-    await checkOwner();
-  }
-
-  async function checkOwner() {
-    const owner = await u.admin.address;
-    console.log('Contract Owner: ', aliases[owner], ' = ', owner);
-    return owner.toString();
-  }
-
-  async function subscribe(user) {
-    // Alice approves a subscription to the app
-    console.log(sf.host.callAgreement);
-    console.log(sf.agreements.ida.address);
-    console.log(usdcx.address);
-    console.log(app.address);
-    await web3tx(
-      sf.host.callAgreement,
-      'user approves subscription to the app',
-    )(
-      sf.agreements.ida.address,
-      sf.agreements.ida.contract.methods
-        .approveSubscription(ethx.address, app.address, 0, '0x')
-        .encodeABI(),
-      '0x', // user data
-      {
-        from: user,
-      },
-    );
   }
 
   async function delta(account, balances) {
@@ -642,72 +541,6 @@ describe('StreamExchange', () => {
       await tp.submitValue(60, oraclePrice);
       await app.distribute();
       console.log('Distribution.');
-
-      // Connect Admin and Bob
-      // await u.admin.flow({ flowRate: inflowRate3, recipient: u.app });
-      // // Expect the parameters are correct
-      // expect(await app.getStreamRate(u.admin.address)).to.equal(inflowRate3);
-      // expect((await app.getIDAShares(0, u.admin.address)).toString()).to.equal(`true,true,${inflowRateIDAShares3},0`);
-      // expect((await app.getIDAShares(0, u.admin.address)).toString()).to.equal(`true,true,${inflowRateIDAShares3},0`);
-      // await traveler.advanceTimeAndBlock(60 * 60 * 4);
-      // await tp.submitValue(60, oraclePrice);
-      // await app.distribute();
-      // console.log('Distribution.');
-
-      // // Lower bobs rate
-      // await u.admin.flow({ flowRate: inflowRate2, recipient: u.app });
-      // // Expect the parameters are correct
-      // expect(await app.getStreamRate(u.admin.address)).to.equal(inflowRate);
-      // expect(await app.getStreamRate(u.bob.address)).to.equal(inflowRate);
-      // expect((await app.getIDAShares(0, u.admin.address)).toString()).to.equal("true,true,"+inflowRateIDAShares+",0");
-      // expect((await app.getIDAShares(1, u.bob.address)).toString()).to.equal("true,true,"+inflowRateIDAShares+",0");
-      // expect((await app.getIDAShares(0, u.admin.address)).toString()).to.equal("true,true,"+inflowRateIDAShares+",0");
-      // expect((await app.getIDAShares(1, u.bob.address)).toString()).to.equal("true,true,"+inflowRateIDAShares+",0");
-      // await traveler.advanceTimeAndBlock(60*60*8);
-      // await tp.submitValue(60, oraclePrice);
-      // await app.distribute()
-      // console.log("Distribution.")
-      // // Lower bobs rate
-      // await u.bob.flow({ flowRate: "0", recipient: u.app });
-      // // Expect the parameters are correct
-      // expect(await app.getStreamRate(u.admin.address)).to.equal(inflowRate);
-      // expect(await app.getStreamRate(u.bob.address)).to.equal("0");
-      // expect((await app.getIDAShares(0, u.admin.address)).toString()).to.equal("true,true,"+inflowRateIDAShares+",0");
-      // expect((await app.getIDAShares(1, u.bob.address)).toString()).to.equal("true,true,0,0");
-      // expect((await app.getIDAShares(0, u.admin.address)).toString()).to.equal("true,true,"+inflowRateIDAShares+",0");
-      // expect((await app.getIDAShares(1, u.bob.address)).toString()).to.equal("true,true,0,0");
-
-      // console.log("Running hourly distributions until bobs balances is below the closeout threshold")
-      // while((await usdcx.balanceOf(u.bob.address)) > inflowRateDecimal * 2 * 60 * 60 * 8 * 1e18 ) {
-      //   await traveler.advanceTimeAndBlock(60*60*8);
-      //   await tp.submitValue(60, oraclePrice);
-      //   await app.distribute()
-      //   console.log("Distribution.")
-      //   await takeMeasurements();
-      //   await delta("Bob", bobBalances)
-      //   await delta("Alice", aliceBalances)
-      //   await delta("Owner", ownerBalances)
-      //   console.log("Bob:", bobBalances[bobBalances.length - 1])
-      //   // console.log("Alice:", bobBalances[bobBalances.length - 1])
-      //   console.log("Admin:", ownerBalances[ownerBalances.length - 1])
-      //   await sleep(3000);
-      // }
-      //
-      // console.log("Bob's balance is low, closing")
-      // // Try to close bobs stream
-      // await app.closeStream(u.admin.address);
-      // // Verify its closed and cleaned up
-      // expect(await app.getStreamRate(u.admin.address)).to.equal("0")
-      // expect((await app.getIDAShares(0, u.admin.address)).toString()).to.equal("true,true,0,0")
-      // expect((await app.getIDAShares(1, u.admin.address)).toString()).to.equal("true,true,0,0")
-
-      // await traveler.advanceTimeAndBlock(60*60*1 + 13);
-      // await tp.submitValue(60, oraclePrice);
-      // await app.distribute()
-      // await u.admin.flow({ flowRate: "0", recipient: u.app });
-      // await traveler.advanceTimeAndBlock(60);
-      // await u.admin.flow({ flowRate: inflowRate, recipient: u.app });
-      // await u.admin.flow({ flowRate: "0", recipient: u.app });
     });
   });
 });

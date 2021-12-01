@@ -12,3 +12,4 @@ coverage.json
 typechain
 cache
 artifacts
+brownie_test.ps1
