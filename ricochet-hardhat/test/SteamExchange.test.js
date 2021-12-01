@@ -167,6 +167,7 @@ describe('StreamExchange', () => {
   }
 
   before(async () => {
+    //console.log((new BN('4').toString()),'<-----------------------------')
     // ==============
     // impersonate accounts and set balances
 
@@ -199,7 +200,7 @@ describe('StreamExchange', () => {
     wbtcx = sf.tokens.WBTCx;
     daix = sf.tokens.DAIx;
     usdcx = sf.tokens.USDCx;
-    //console.log(sf,'<-----------------------------')
+    
 
     // ==============
     // Init SF users
