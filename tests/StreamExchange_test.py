@@ -24,6 +24,7 @@ global alice
 global bob
 global carl
 global spender
+SF_HOST = '0x3E14dC1b13c488a8d5D310918780c983bD5982E7'
 SF_RESOLVER = '0xE0cc76334405EE8b39213E620587d815967af39C'
 RIC_TOKEN_ADDRESS = '0x263026E7e53DBFDce5ae55Ade22493f828922965'
 SUSHISWAP_ROUTER_ADDRESS = '0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff'
@@ -56,18 +57,18 @@ async def createSFRegistrationKey(sf, deployer):
             )
         )
 
-    #governance = await sf.host.getGovernance.call()
+    governance = await SF_HOST.getGovernance.call()
     print('SF Governance:', governance)
 
     sfGovernanceRo = await Contract.from_abi(str(governance), SuperfluidGovernanceBase.abi)
     
     govOwner = await sfGovernanceRo.owner()
     #impersonateAndSetBalance(govOwner)
-    accounts[0].transfer(govOwner, "10 ether")  #for initialization
+    owner.transfer(govOwner, "10 ether")  #for initialization
 
     sfGovernance = await Contract.from_abi(str(governance), SuperfluidGovernanceBase.abi, {'from': govOwner})
 
-    #await sfGovernance.whiteListNewApp(sf.host.address, appKey)
+    await sfGovernance.whiteListNewApp(SF_HOST.address, appKey)
 
     return registrationKey
 
@@ -100,7 +101,7 @@ bobBalances = {
     'ric': [],
   }
 
-async def approveSubscriprions(users = [alice.address, bob.address, admin.address], tokens = [wbtcx.address, ricAddress]):
+async def approveSubscriprions(users = [alice.address, bob.address, owner.address], tokens = [wbtcx.address, ricAddress]):
     print('Approving subscriptions...')
 
     for tokenIndex in range(0, len(tokens) - 1):
@@ -120,22 +121,22 @@ def before():
     spender = accounts[4].address = USDCX_SOURCE_ADDRESS
     accountsArray = [owner, alice, bob, carl, spender]
 
-    sf = MockSuperfluid.deploy({'from': accounts[0]})
+    sf = MockSuperfluid.deploy({'from': owner})
 
-    mock_eth = MockERC20.deploy('name1', 'symbol1', {'from': accounts[0]})
-    ethx = MockSuperToken.deploy({'from': accounts[0]})
+    mock_eth = MockERC20.deploy('name1', 'symbol1', {'from': owner})
+    ethx = MockSuperToken.deploy({'from': owner})
     ethx.setInputToken(mock_eth.address)
 
-    mock_wbtc = MockERC20.deploy('name2', 'symbol2', {'from': accounts[0]})
-    wbtcx = MockSuperToken.deploy({'from': accounts[0]})
+    mock_wbtc = MockERC20.deploy('name2', 'symbol2', {'from': owner})
+    wbtcx = MockSuperToken.deploy({'from': owner})
     wbtcx.setInputToken(mock_wbtc.address)
 
-    mock_daix = MockERC20.deploy('name3', 'symbol3', {'from': accounts[0]})
-    daix = MockSuperToken.deploy({'from': accounts[0]})
+    mock_daix = MockERC20.deploy('name3', 'symbol3', {'from': owner})
+    daix = MockSuperToken.deploy({'from': owner})
     daix.setInputToken(mock_daix.address)
 
-    mock_usdcx = MockERC20.deploy('name4', 'symbol4', {'from': accounts[0]})
-    usdcx = MockSuperToken.deploy({'from': accounts[0]})
+    mock_usdcx = MockERC20.deploy('name4', 'symbol4', {'from': owner})
+    usdcx = MockSuperToken.deploy({'from': owner})
     usdcx.setInputToken(mock_usdcx.address)
 
     
@@ -143,9 +144,9 @@ def before():
     #tp = TellorPlayground()
 
 def beforeEach():
-    sed = StreamExchangeHelper.deploy({'from': accounts[0]})
+    sed = StreamExchangeHelper.deploy({'from': owner})
 
-    registrationKey = await createSFRegistrationKey(sf, accounts[0])
+    registrationKey = await createSFRegistrationKey(sf, owner)
 
     app = StreamExchange.deploy(
         "0x3D7CD28EfD08FfE9Ce8cA329EC2e67822C756526",
@@ -158,13 +159,13 @@ def beforeEach():
         "0xACC2d27400029904919ea54fFc0b18Bf07C57875",
         "60",
         registrationKey,
-        {'from': accounts[0]}
+        {'from': owner}
     )
 
 """ @pytest.fixture(scope="module", autouse=True)
 def beforeEach(StreamExchangeHelper, accounts):
-    a = accounts[0].deploy(StreamExchangeHelper)
-    b = accounts[0].deploy(
+    a = owner.deploy(StreamExchangeHelper)
+    b = owner.deploy(
         StreamExchange,
         "0x3D7CD28EfD08FfE9Ce8cA329EC2e67822C756526",
         "0xF4C5310E51F6079F601a5fb7120bC72a70b96e2A",
@@ -193,22 +194,22 @@ async def delta():
 
 async def takeMeasurements():
     appBalances.ethx.push(str(await ethx.balanceOf(app.address)))
-    ownerBalances.ethx.push(str(await ethx.balanceOf(admin.address)))
+    ownerBalances.ethx.push(str(await ethx.balanceOf(owner.address)))
     aliceBalances.ethx.push(str(await ethx.balanceOf(alice.address)))
     bobBalances.ethx.push(str(await ethx.balanceOf(bob.address)))
 
     appBalances.wbtcx.push(str(await wbtcx.balanceOf(app.address)))
-    ownerBalances.wbtcx.push(str(await wbtcx.balanceOf(admin.address)))
+    ownerBalances.wbtcx.push(str(await wbtcx.balanceOf(owner.address)))
     aliceBalances.wbtcx.push(str(await wbtcx.balanceOf(alice.address)))
     bobBalances.wbtcx.push(str(await wbtcx.balanceOf(bob.address)))
 
     appBalances.usdcx.push(str(await usdcx.balanceOf(app.address)))
-    ownerBalances.usdcx.push(str(await usdcx.balanceOf(admin.address)))
+    ownerBalances.usdcx.push(str(await usdcx.balanceOf(owner.address)))
     aliceBalances.usdcx.push(str(await usdcx.balanceOf(alice.address)))
     bobBalances.usdcx.push(str(await usdcx.balanceOf(bob.address)))
 
     appBalances.ric.push(str(await ric.balanceOf(app.address)))
-    ownerBalances.ric.push(str(await ric.balanceOf(admin.address)))
+    ownerBalances.ric.push(str(await ric.balanceOf(owner.address)))
     aliceBalances.ric.push(str(await ric.balanceOf(alice.address)))
     bobBalances.ric.push(str(await ric.balanceOf(bob.address)))
 
@@ -224,19 +225,19 @@ async def test_should_be_correctly_configured():
     assert (await app.getSushiRouter()) == SUSHISWAP_ROUTER_ADDRESS
     assert (await app.getTellorOracle()) ==TELLOR_ORACLE_ADDRESS
     assert (await app.getRequestId()) == 60
-    assert (await app.getOwner()) == admin.address #u.admin.address
+    assert (await app.getOwner()) == owner.address #u.owner.address
     assert (await app.getFeeRate()) == 20000
 
 async def test_should_create_a_stream_exchange_with_the_correct_parameters():
     inflowRate = '77160493827160'
     inflowRateIDAShares = '77160'
 
-    await approveSubscriprions([admin.address]) #u.admin.address
+    await approveSubscriprions([owner.address]) #u.owner.address
 
-    await admin.flow({flowRate: inflowRate, recipient app}) #u.admin.flow___and___u.app?
+    await owner.flow({flowRate: inflowRate, recipient app}) #u.owner.flow___and___u.app?
 
-    assert (await app.getStreamRate(admin.address)) == inflowRate
-    assert str(await app.getIDAShares(0, admin.address)) == 'True,True,77160,0'
+    assert (await app.getStreamRate(owner.address)) == inflowRate
+    assert str(await app.getIDAShares(0, owner.address)) == 'True,True,77160,0'
 
 async def test_approval_should_be_unlimited():
     await approveSubscriprions()
@@ -324,25 +325,25 @@ async def test_should_correctly_emergency_drain():
 
 async def test_should_emergency_close_stream_if_app_jailed():
     inflowRate = '100000000'
-    await admin.flow({ flowRate: inflowRate, recipient: u.app })#?
-    assert (await app.getStreamRate(admin.address)) == inflowRate
+    await owner.flow({ flowRate: inflowRate, recipient: u.app })#?
+    assert (await app.getStreamRate(owner.address)) == inflowRate
     with brownie.revert('!jailed'):
-        await app.emergencyCloseStream(admin.address)
+        await app.emergencyCloseStream(owner.address)
     
     await Web3(
-        sf.host.jailApp,#host address
+        SF_HOST.jailApp,#host address
         'CFA jails App',
         )
             (
                 '0x',
                 app.address.
                 0,
-                {'from': sf.agreements.cfa.address}, #CFA Address
+                {'from': "0xF4C5310E51F6079F601a5fb7120bC72a70b96e2A"}, #CFA Address sf.agreements.cfa.address
             )
 
-    assert (await sh.host.isAppJailed(app.address)) == True
-    await app.emergencyCloseStream(admin.address)
-    assert (await app.getStreamRate(admin.address)) == '0'
+    assert (await SF_HOST.isAppJailed(app.address)) == True
+    await app.emergencyCloseStream(owner.address)
+    assert (await app.getStreamRate(owner.address)) == '0'
 
 async def test_should_distribute_tokens_to_streamers_correctly():
     inflowRate1 = '77160493827160'
@@ -356,27 +357,27 @@ async def test_should_distribute_tokens_to_streamers_correctly():
 
     await usdcx.transfer(bob.address, 400*(10**18), {'from': spender.address})#? toWad
     await usdcx.transfer(alice.address, 400*(10**18), {'from': spender.address})#? toWad
-    await usdcx.transfer(admin.address, 400*(10**18), {'from': spender.address})#? toWad
+    await usdcx.transfer(owner.address, 400*(10**18), {'from': spender.address})#? toWad
 
     await takeMeasurements()
 
     with brownie.revert('!enoughTokens'):
-        admin.flow({ flowRate: 10000*(10**18), recipient: u.app })#? toWad
+        owner.flow({ flowRate: 10000*(10**18), recipient: u.app })#? toWad
 
-    await admin.flow({ flowRate: inflowRate1, recipient: u.app })#?
+    await owner.flow({ flowRate: inflowRate1, recipient: u.app })#?
 
-    assert (await app.getStreamRate(admin.address)) == inflowRate1
-    assert str(await app.getIDAShares(0, admin.address)) == 'True,True,77160,0'
+    assert (await app.getStreamRate(owner.address)) == inflowRate1
+    assert str(await app.getIDAShares(0, owner.address)) == 'True,True,77160,0'
     await brownie.chain.sleep(60*60*12)
     await tp.submitValue(60, oraclePrice)
     await app.distribute()
     await brownie.chain.sleep(60*60*1)
     await tp.submitValue(60, oraclePrice)
 
-    await admin.flow({ flowRate: inflowRate2, recipient: u.app })#?
-    assert (await app.getStreamRate(admin.address)) == inflowRate2
-    assert str(await app.getIDAShares(0, admin.address)) == 'True,True,964506,0'
-    assert str(await app.getIDAShares(0, admin.address)) == 'True,True,964506,0'
+    await owner.flow({ flowRate: inflowRate2, recipient: u.app })#?
+    assert (await app.getStreamRate(owner.address)) == inflowRate2
+    assert str(await app.getIDAShares(0, owner.address)) == 'True,True,964506,0'
+    assert str(await app.getIDAShares(0, owner.address)) == 'True,True,964506,0'
     await brownie.chain.sleep(60*60*2)
     await tp.submitValue(60, oraclePrice)
     await app.distribute()
