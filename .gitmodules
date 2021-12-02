@@ -1,0 +1,9 @@
+[submodule "modules/OpenZeppelin/openzeppelin-contracts"]
+	path = modules/OpenZeppelin/openzeppelin-contracts
+	url = https://github.com/OpenZeppelin/openzeppelin-contracts.git
+[submodule "modules/Uniswap/v2-core"]
+	path = modules/Uniswap/v2-core
+	url = https://github.com/Uniswap/v2-core.git
+[submodule "modules/Uniswap/v2-periphery"]
+	path = modules/Uniswap/v2-periphery
+	url = https://github.com/Uniswap/v2-periphery.git

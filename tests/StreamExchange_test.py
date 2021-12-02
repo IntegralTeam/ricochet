@@ -1,14 +1,13 @@
 from web3 import Web3
-from chai import Chai
 from brownie.network.state import Chain
 from brownie import StreamExchange, StreamExchangeHelper, MockERC20, MockSuperToken, MockSuperfluid, accounts
 from datetime import datetime
 import pytest
 
 
-global sf
-global daix
-global ethx
+sf = None
+daix = None
+ethx = None
 global wbtc
 global wbtcx
 global usdcx
@@ -69,9 +68,8 @@ bobBalances = {
     'ric': [],
   }
 
-        
-@pytest.fixture(scope="module", autouse=True)
 
+@pytest.fixture(scope="module", autouse=True)
 def before():
     accountsArray = [owner, alice, bob, carl, spender]
 
@@ -92,8 +90,6 @@ def before():
     mock_usdcx = MockERC20.deploy('name4', 'symbol4', {'from': owner})
     usdcx = MockSuperToken.deploy({'from': owner})
     usdcx.setInputToken(mock_usdcx.address)
-
-    
 
     #tp = TellorPlayground()
 
@@ -121,7 +117,7 @@ def createSFRegistrationKey(sf, deployer):
     print('SF Governance:', governance)
 
     sfGovernanceRo = Contract.from_abi(str(governance), SuperfluidGovernanceBase.abi)
-    
+
     govOwner = sfGovernanceRo.owner()
     #impersonateAndSetBalance(govOwner)
     owner.transfer(govOwner, "10 ether")  #for initialization
@@ -182,15 +178,15 @@ def beforeEach(StreamExchangeHelper, accounts):
 def isolation(fn_isolation):
     pass """
 
-def checkBalance(user): 
+def checkBalance(user):
     print('Balance of ', user.address)
     print('usdcx: ', str(usdcx.balanceOf(user.address)))
     print('wbtcx: ', str(wbtcx.balanceOf(user.address)))
-    
+
 def checkBalances(accountsArray):
     for i in range(0, len(accountsArray)):
         checkBalance(accountsArray[i])
-    
+
 def delta():
     length = len(balances.wbtcx) #is len reserved?
     changeInOutToken = balances.wbtcx[length - 1] - balances.wbtcx[length - 2]
@@ -263,7 +259,7 @@ def test_should_let_keepers_close_streams_with_less_than_8_hours_left():
 
     with brownie.revert('!closable'):
         app.closeStream(bob.address)
-    
+
     brownie.chain.sleep(3600)
 
     app.closeStream(bob.address)
@@ -333,7 +329,7 @@ def test_should_emergency_close_stream_if_app_jailed():
     assert (app.getStreamRate(owner.address)) == inflowRate
     with brownie.revert('!jailed'):
         app.emergencyCloseStream(owner.address)
-    
+
     """   Web3(
         SF_HOST.jailApp,#host address
         'CFA jails App',

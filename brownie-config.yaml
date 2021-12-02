@@ -3,47 +3,28 @@ dotenv: .env
 networks:
   default: development
 
-  rinkeby:
-    host: https://rinkeby.infura.io/v3/${INFURA_KEY}
-    accounts: [RINKEBY_PRIVATE_KEY]
-    gas_limit: 2000000
-    gas_price: 20000000000
-
-  polygon:
-    host: https://polygon-mainnet.infura.io/v3/${INFURA_KEY}
-    accounts: [MATIC_PRIVATE_KEY]
-    gas_limit: 2000000
-    gas_price: 20000000000
-
-
   development:
     gas_limit: max
     gas_buffer: 1
     gas_price: 80000
-    max_fee: null
-    priority_fee: null
     reverting_tx_gas_limit: max
     default_contract_owner: true
     cmd_settings:
       port: 8545
       gas_limit: 6721975
       accounts: 10
-      evm_version: istanbul
+      fork: ${MAINNET_API_URL}
       host: https://127.0.0.1
-      fork:
-      mnemonic: 
-     
+      mnemonic: ${MNEMONIC}
 
 etherscan:
-  apiKey: ETHERSCAN_API_KEY
-
+  apiKey: ${ETHERSCAN_API_KEY}
 
 compiler:
     solc:
-      #version: 0.7.6
       version: 0.8.3
       remappings:
-        - "@openzeppelin=./modules/OpenZeppelin/openzeppelin-contracts@4.0.0"
+        - "@openzeppelin=./modules/OpenZeppelin/openzeppelin-contracts"
         - "@superfluid-finance/ethereum-contracts=./modules/superfluid-finance/ethereum-contracts"
-        - "@uniswap/v2-periphery=./modules/Uniswap/v2-periphery@1.1.0-beta.0"
-        - "@uniswap/v2-core=./modules/Uniswap/v2-core@1.0.1"
+        - "@uniswap/v2-periphery=./modules/Uniswap/v2-periphery"
+        - "@uniswap/v2-core=./modules/Uniswap/v2-core"
