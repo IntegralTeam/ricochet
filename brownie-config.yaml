@@ -30,7 +30,8 @@ networks:
       accounts: 10
       evm_version: istanbul
       host: https://127.0.0.1
-      mnemonic: MNEMONIC
+      fork:
+      mnemonic: 
      
 
 etherscan:

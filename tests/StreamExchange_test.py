@@ -2,8 +2,8 @@ from web3 import Web3
 from chai import Chai
 from brownie.network.state import Chain
 from brownie import StreamExchange, StreamExchangeHelper, MockERC20, MockSuperToken, MockSuperfluid, accounts
-import pytest
 from datetime import datetime
+import pytest
 
 
 global sf
@@ -17,13 +17,16 @@ global usdc
 global app
 global tp # Tellor playground
 ricAddress = '0x263026e7e53dbfdce5ae55ade22493f828922965'
-u = {} # object with all users
-aliases = {}
 global owner
 global alice
 global bob
 global carl
 global spender
+owner = accounts[0]
+alice = accounts[1]
+bob = accounts[2]
+carl = accounts[3]
+spender = accounts[4].address = USDCX_SOURCE_ADDRESS
 SF_HOST = '0x3E14dC1b13c488a8d5D310918780c983bD5982E7'
 SF_RESOLVER = '0xE0cc76334405EE8b39213E620587d815967af39C'
 RIC_TOKEN_ADDRESS = '0x263026E7e53DBFDce5ae55Ade22493f828922965'
@@ -36,6 +39,63 @@ BOB_ADDRESS = '0x00Ce20EC71942B41F50fF566287B811bbef46DC8'
 ALICE_ADDRESS = '0x9f348cdD00dcD61EE7917695D2157ef6af2d7b9B'
 OWNER_ADDRESS = '0x3226C9EaC0379F04Ba2b1E1e1fcD52ac26309aeA'
 global oraclePrice
+
+appBalances = {
+    'ethx': [],
+    'wbtcx': [],
+    'daix': [],
+    'usdcx': [],
+    'ric': [],
+  }
+ownerBalances = {
+    'ethx': [],
+    'wbtcx': [],
+    'daix': [],
+    'usdcx': [],
+    'ric': [],
+  }
+aliceBalances = {
+    'ethx': [],
+    'wbtcx': [],
+    'daix': [],
+    'usdcx': [],
+    'ric': [],
+  }
+bobBalances = {
+    'ethx': [],
+    'wbtcx': [],
+    'daix': [],
+    'usdcx': [],
+    'ric': [],
+  }
+
+        
+@pytest.fixture(scope="module", autouse=True)
+
+def before():
+    accountsArray = [owner, alice, bob, carl, spender]
+
+    sf = MockSuperfluid.deploy({'from': owner})
+
+    mock_eth = MockERC20.deploy('name1', 'symbol1', {'from': owner})
+    ethx = MockSuperToken.deploy({'from': owner})
+    ethx.setInputToken(mock_eth.address)
+
+    mock_wbtc = MockERC20.deploy('name2', 'symbol2', {'from': owner})
+    wbtcx = MockSuperToken.deploy({'from': owner})
+    wbtcx.setInputToken(mock_wbtc.address)
+
+    mock_daix = MockERC20.deploy('name3', 'symbol3', {'from': owner})
+    daix = MockSuperToken.deploy({'from': owner})
+    daix.setInputToken(mock_daix.address)
+
+    mock_usdcx = MockERC20.deploy('name4', 'symbol4', {'from': owner})
+    usdcx = MockSuperToken.deploy({'from': owner})
+    usdcx.setInputToken(mock_usdcx.address)
+
+    
+
+    #tp = TellorPlayground()
 
 def createSFRegistrationKey(sf, deployer):
     global registrationKey
@@ -72,36 +132,7 @@ def createSFRegistrationKey(sf, deployer):
 
     return registrationKey
 
-appBalances = {
-    'ethx': [],
-    'wbtcx': [],
-    'daix': [],
-    'usdcx': [],
-    'ric': [],
-  }
-ownerBalances = {
-    'ethx': [],
-    'wbtcx': [],
-    'daix': [],
-    'usdcx': [],
-    'ric': [],
-  }
-aliceBalances = {
-    'ethx': [],
-    'wbtcx': [],
-    'daix': [],
-    'usdcx': [],
-    'ric': [],
-  }
-bobBalances = {
-    'ethx': [],
-    'wbtcx': [],
-    'daix': [],
-    'usdcx': [],
-    'ric': [],
-  }
-
-def approveSubscriprions(users = [alice.address, bob.address, owner.address], tokens = [wbtcx.address, ricAddress]):
+def approveSubscriprions(users = [alice.address, bob.address, owner.address], tokens = [wbtcx.address, ricAddress]): # [accounts[1].address, accounts[2].address, accounts[0].address]
     print('Approving subscriptions...')
 
     for tokenIndex in range(0, len(tokens) - 1):
@@ -111,37 +142,6 @@ def approveSubscriprions(users = [alice.address, bob.address, owner.address], to
                 index = 1
 
             #web3tx?
-            
-
-def before():
-    owner = accounts[0]
-    alice = accounts[1]
-    bob = accounts[2]
-    carl = accounts[3]
-    spender = accounts[4].address = USDCX_SOURCE_ADDRESS
-    accountsArray = [owner, alice, bob, carl, spender]
-
-    sf = MockSuperfluid.deploy({'from': owner})
-
-    mock_eth = MockERC20.deploy('name1', 'symbol1', {'from': owner})
-    ethx = MockSuperToken.deploy({'from': owner})
-    ethx.setInputToken(mock_eth.address)
-
-    mock_wbtc = MockERC20.deploy('name2', 'symbol2', {'from': owner})
-    wbtcx = MockSuperToken.deploy({'from': owner})
-    wbtcx.setInputToken(mock_wbtc.address)
-
-    mock_daix = MockERC20.deploy('name3', 'symbol3', {'from': owner})
-    daix = MockSuperToken.deploy({'from': owner})
-    daix.setInputToken(mock_daix.address)
-
-    mock_usdcx = MockERC20.deploy('name4', 'symbol4', {'from': owner})
-    usdcx = MockSuperToken.deploy({'from': owner})
-    usdcx.setInputToken(mock_usdcx.address)
-
-    
-
-    #tp = TellorPlayground()
 
 @pytest.fixture(autouse=True)
 def isolation(fn_isolation):
@@ -258,7 +258,7 @@ def test_should_let_keepers_close_streams_with_less_than_8_hours_left():
     initialDeposit = bobUsdcxBalance / 13 * 4
     inflowRate = str((bobUsdcxBalance - initialDeposit) / (9 * 3600))
 
-    bob.flow({flowRate: inflowRate, recipient: u.app }) #u.bob.flow()____and____u.app?
+    bob.flow({flowRate: inflowRate, recipient: app }) #u.bob.flow()____and____u.app?
     assert app.getStreamRate(bob.address) == inflowRate
 
     with brownie.revert('!closable'):
@@ -282,8 +282,8 @@ def test_should_distribute_tokens_to_streamers():
     inflowRateIDAShares = '1000000'
     inflowRateIDASharesx2 = '2000000'
 
-    alice.flow({flowRate: inflowRate, recipient: u.app })
-    bob.flow({ flowRate: inflowRatex2, recipient: u.app })
+    alice.flow({flowRate: inflowRate, recipient: app })
+    bob.flow({ flowRate: inflowRatex2, recipient: app })
 
     assert (app.getStreamRate(alice.address)) == inflowRate
     assert str(app.getIDAShares(0, alice.address)) == 'True,True,1000000,0' #or T in lowcase?
@@ -329,7 +329,7 @@ def test_should_correctly_emergency_drain():
 
 def test_should_emergency_close_stream_if_app_jailed():
     inflowRate = '100000000'
-    owner.flow({ flowRate: inflowRate, recipient: u.app })#?
+    owner.flow({ flowRate: inflowRate, recipient: app })#?
     assert (app.getStreamRate(owner.address)) == inflowRate
     with brownie.revert('!jailed'):
         app.emergencyCloseStream(owner.address)
@@ -366,9 +366,9 @@ def test_should_distribute_tokens_to_streamers_correctly():
     takeMeasurements()
 
     with brownie.revert('!enoughTokens'):
-        owner.flow({ flowRate: 10000*(10**18), recipient: u.app })#? toWad
+        owner.flow({ flowRate: 10000*(10**18), recipient: app })#? toWad
 
-    owner.flow({ flowRate: inflowRate1, recipient: u.app })#?
+    owner.flow({ flowRate: inflowRate1, recipient: app })#?
 
     assert (app.getStreamRate(owner.address)) == inflowRate1
     assert str(app.getIDAShares(0, owner.address)) == 'True,True,77160,0'
@@ -378,7 +378,7 @@ def test_should_distribute_tokens_to_streamers_correctly():
     brownie.chain.sleep(60*60*1)
     tp.submitValue(60, oraclePrice)
 
-    owner.flow({ flowRate: inflowRate2, recipient: u.app })#?
+    owner.flow({ flowRate: inflowRate2, recipient: app })#?
     assert (app.getStreamRate(owner.address)) == inflowRate2
     assert str(app.getIDAShares(0, owner.address)) == 'True,True,964506,0'
     assert str(app.getIDAShares(0, owner.address)) == 'True,True,964506,0'
