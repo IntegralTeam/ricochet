@@ -1,37 +1,6 @@
 dotenv: .env
 
 networks:
-<<<<<<< HEAD
-    default: development
-
-    development:
-      host: http://127.0.0.1
-      gas_price: 0
-      persist: false
-      reverting_tx_gas_limit: 6721975
-      test_rpc:
-        fork: https://polygon-mainnet.g.alchemy.com/v2/iau-uzu7ghda0v8fr2g5p34
-        cmd: ganache-cli
-        port: 8545
-        gas_limit: 6721975
-        accounts: 11
-        evm_version: istanbul
-        mnemonic: mean ahead wire antique fiber detail clog mail anchor mail zone sign
-      
-    rinkeby:
-      host: https://rinkeby.infura.io/v3/${INFURA_KEY}
-      accounts: [RINKEBY_PRIVATE_KEY]
-      gas_limit: 2000000
-      gas_price: 20000000000
-
-    polygon:
-      host: https://polygon-mainnet.infura.io/v3/${INFURA_KEY}
-      accounts: [MATIC_PRIVATE_KEY]
-      gas_limit: 2000000
-      gas_price: 20000000000
-
-
-=======
   default: development
 
   development:
@@ -47,7 +16,6 @@ networks:
       fork: ${MAINNET_API_URL}
       host: https://127.0.0.1
       mnemonic: ${MNEMONIC}
->>>>>>> 22fd5d24c31ae266e63831cafa1530a522e4f196
 
 etherscan:
   apiKey: ${ETHERSCAN_API_KEY}
