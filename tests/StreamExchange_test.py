@@ -6,22 +6,17 @@ from datetime import datetime
 import pytest
 
 
-global sf
-global daix
-global ethx
-global wbtc
-global wbtcx
-global usdcx
-global ric
-global usdc
-global app
-global tp # Tellor playground
+sf
+daix
+ethx
+wbtc
+wbtcx
+usdcx
+ric
+usdc
+app
+tp # Tellor playground
 ricAddress = '0x263026e7e53dbfdce5ae55ade22493f828922965'
-global owner
-global alice
-global bob
-global carl
-global spender
 owner = accounts[0]
 alice = accounts[1]
 bob = accounts[2]
@@ -38,7 +33,7 @@ CARL_ADDRESS = '0x8c3bf3EB2639b2326fF937D041292dA2e79aDBbf'
 BOB_ADDRESS = '0x00Ce20EC71942B41F50fF566287B811bbef46DC8'
 ALICE_ADDRESS = '0x9f348cdD00dcD61EE7917695D2157ef6af2d7b9B'
 OWNER_ADDRESS = '0x3226C9EaC0379F04Ba2b1E1e1fcD52ac26309aeA'
-global oraclePrice
+oraclePrice
 
 appBalances = {
     'ethx': [],
@@ -98,12 +93,12 @@ def before():
     #tp = TellorPlayground()
 
 def createSFRegistrationKey(sf, deployer):
-    global registrationKey
-    global appKey
-    global governance
-    global sfGovernanceRo
-    global govOwner
-    global sfGovernance
+    registrationKey
+    appKey
+    governance
+    sfGovernanceRo
+    govOwner
+    sfGovernance
 
     registrationKey = 'testKey-{}'.format(datetime.now())
     appKey = Web3.solidityKeccak(
@@ -142,6 +137,7 @@ def approveSubscriprions(users = [alice.address, bob.address, owner.address], to
                 index = 1
 
             #web3tx?
+    #contract_instance = Contract.at('0x3E14dC1b13c488a8d5D310918780c983bD5982E7')
 
 @pytest.fixture(autouse=True)
 def isolation(fn_isolation):
@@ -334,13 +330,17 @@ def test_should_emergency_close_stream_if_app_jailed():
     with brownie.revert('!jailed'):
         app.emergencyCloseStream(owner.address)
     
-    """   Web3(
+    #w3 = Web3(Web3.EthereumTesterProvider())
+    #w3.eth.default_account = '0xF4C5310E51F6079F601a5fb7120bC72a70b96e2A'
+    #contract_instance = Contract('0x3E14dC1b13c488a8d5D310918780c983bD5982E7')
+    #contract_instance.jailApp('0x', app.address, 0, {'from': "0xF4C5310E51F6079F601a5fb7120bC72a70b96e2A"})
+    """ Web3(
         SF_HOST.jailApp,#host address
         'CFA jails App',
         )
         (
         '0x',
-        app.address.
+        app.address,
         0,
         {'from': "0xF4C5310E51F6079F601a5fb7120bC72a70b96e2A"}, #CFA Address sf.agreements.cfa.address
         ) """
