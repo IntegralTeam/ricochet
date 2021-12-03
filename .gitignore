@@ -4,6 +4,7 @@ __pycache__
 .hypothesis/
 build/
 reports/
+rename.sh
 
 #Hardhat files
 node_modules

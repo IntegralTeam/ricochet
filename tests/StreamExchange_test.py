@@ -20,14 +20,14 @@ owner = accounts[0]
 alice = accounts[1]
 bob = accounts[2]
 carl = accounts[3]
-spender = accounts[4].address = USDCX_SOURCE_ADDRESS
+USDCX_SOURCE_ADDRESS = '0x02757cf1281db2f16b08b90636d11db3a5f6d09a'
+spender = accounts[4]
 SF_HOST = '0x3E14dC1b13c488a8d5D310918780c983bD5982E7'
 SF_RESOLVER = '0xE0cc76334405EE8b39213E620587d815967af39C'
 RIC_TOKEN_ADDRESS = '0x263026E7e53DBFDce5ae55Ade22493f828922965'
 SUSHISWAP_ROUTER_ADDRESS = '0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff'
 TELLOR_ORACLE_ADDRESS = '0xACC2d27400029904919ea54fFc0b18Bf07C57875'
 TELLOR_REQUEST_ID = 60
-USDCX_SOURCE_ADDRESS = '0x02757cf1281db2f16b08b90636d11db3a5f6d09a'
 CARL_ADDRESS = '0x8c3bf3EB2639b2326fF937D041292dA2e79aDBbf'
 BOB_ADDRESS = '0x00Ce20EC71942B41F50fF566287B811bbef46DC8'
 ALICE_ADDRESS = '0x9f348cdD00dcD61EE7917695D2157ef6af2d7b9B'
@@ -93,12 +93,12 @@ def createSFRegistrationKey(sf, deployer):
         web3.eth.abi.encodeParameters(
             ['string','address','string'],
             [
-            'org.superfluid-finance.superfluid.appWhiteListing.registrationKey',
-            str(deployer),
-            registrationKey,
+                'org.superfluid-finance.superfluid.appWhiteListing.registrationKey',
+                str(deployer),
+                registrationKey,
             ]
-            )
         )
+    )
 
     governance = SF_HOST.getGovernance.call()
     print('SF Governance:', governance)
@@ -222,7 +222,7 @@ def test_should_let_keepers_close_streams_with_less_than_8_hours_left():
     bobUsdcxBalance = usdcx.balanceOf(bob.address)
     initialDeposit = bobUsdcxBalance / 13 * 4
     inflowRate = str((bobUsdcxBalance - initialDeposit) / (9 * 3600))
-    bob.flow({flowRate: inflowRate, recipient: app }) 
+    bob.flow({flowRate: inflowRate, recipient: app })
 
     assert app.getStreamRate(bob.address) == inflowRate
 
@@ -301,7 +301,7 @@ def test_should_emergency_close_stream_if_app_jailed():
     assert (app.getStreamRate(owner.address)) == inflowRate
     with brownie.revert('!jailed'):
         app.emergencyCloseStream(owner.address)
-    
+
     #w3 = Web3(Web3.EthereumTesterProvider())
     #w3.eth.default_account = '0xF4C5310E51F6079F601a5fb7120bC72a70b96e2A'
     #contract_instance = Contract('0x3E14dC1b13c488a8d5D310918780c983bD5982E7')
