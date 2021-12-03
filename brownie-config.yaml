@@ -1,6 +1,7 @@
 dotenv: .env
 
 networks:
+<<<<<<< HEAD
     default: development
 
     development:
@@ -30,17 +31,32 @@ networks:
       gas_price: 20000000000
 
 
+=======
+  default: development
+
+  development:
+    gas_limit: max
+    gas_buffer: 1
+    gas_price: 80000
+    reverting_tx_gas_limit: max
+    default_contract_owner: true
+    cmd_settings:
+      port: 8545
+      gas_limit: 6721975
+      accounts: 10
+      fork: ${MAINNET_API_URL}
+      host: https://127.0.0.1
+      mnemonic: ${MNEMONIC}
+>>>>>>> 22fd5d24c31ae266e63831cafa1530a522e4f196
 
 etherscan:
-  apiKey: ETHERSCAN_API_KEY
-
+  apiKey: ${ETHERSCAN_API_KEY}
 
 compiler:
     solc:
-      #version: 0.7.6
       version: 0.8.3
       remappings:
-        - "@openzeppelin=./modules/OpenZeppelin/openzeppelin-contracts@4.0.0"
+        - "@openzeppelin=./modules/OpenZeppelin/openzeppelin-contracts"
         - "@superfluid-finance/ethereum-contracts=./modules/superfluid-finance/ethereum-contracts"
-        - "@uniswap/v2-periphery=./modules/Uniswap/v2-periphery@1.1.0-beta.0"
-        - "@uniswap/v2-core=./modules/Uniswap/v2-core@1.0.1"
+        - "@uniswap/v2-periphery=./modules/Uniswap/v2-periphery"
+        - "@uniswap/v2-core=./modules/Uniswap/v2-core"
