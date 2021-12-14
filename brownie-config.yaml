@@ -1,24 +1,5 @@
 dotenv: .env
-
-networks:
-  default: development
-
-  development:
-    gas_limit: max
-    gas_buffer: 1
-    gas_price: 80000
-    reverting_tx_gas_limit: max
-    default_contract_owner: true
-    cmd_settings:
-      port: 8545
-      gas_limit: 6721975
-      accounts: 10
-      fork: ${MAINNET_API_URL}
-      host: https://127.0.0.1
-      mnemonic: ${MNEMONIC}
-
-etherscan:
-  apiKey: ${ETHERSCAN_API_KEY}
+autofetch_sources: true
 
 compiler:
     solc:

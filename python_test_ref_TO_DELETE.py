@@ -1,55 +1,37 @@
 from web3 import Web3
-# from brownie import StreamExchange, StreamExchangeHelper, ISuperfluid, accounts, Contract
-from brownie import accounts, network, Contract
+from brownie.network.state import Chain
+from brownie import StreamExchange, StreamExchangeHelper, MockERC20, MockSuperToken, MockSuperfluid, accounts
 from datetime import datetime
 import pytest
 
-network.connect('polygon-main-alchemy-fork')
-
-##########################################
-# ALL ADDRESSES ARE FROM POLYGON
-##########################################
-
-names = ['Admin', 'Alice', 'Bob', 'Carl', 'Spender']
-
+sf = None
+daix = None
+ethx = None
+wbtc = None
+wbtcx = None
+usdcx = None
 ric = None
 usdc = None
-app = None
 tp = None # Tellor playground
 
-ricAddress = '0x263026e7e53dbfdce5ae55ade22493f828922965'
-u = dict() # object with all users
-aliases = dict()
+app = None
+sed = None
 
+owner = None
+alice = None
+bob = None
+carl = None
 spender = None
 
-SF_HOST = '0x3E14dC1b13c488a8d5D310918780c983bD5982E7'
+ricAddress = '0x263026e7e53dbfdce5ae55ade22493f828922965'
 
+SF_HOST = '0x3E14dC1b13c488a8d5D310918780c983bD5982E7'
 SF_RESOLVER = '0xE0cc76334405EE8b39213E620587d815967af39C'
 RIC_TOKEN_ADDRESS = '0x263026E7e53DBFDce5ae55Ade22493f828922965'
 SUSHISWAP_ROUTER_ADDRESS = '0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff'
+
 TELLOR_ORACLE_ADDRESS = '0xACC2d27400029904919ea54fFc0b18Bf07C57875'
-TELLOR_REQUEST_ID = 60
-
-# random address from polygonscan that have a lot of usdcx
-USDCX_SOURCE_ADDRESS = '0x02757cf1281db2f16b08b90636d11db3a5f6d09a'
-
-CARL_ADDRESS = '0x8c3bf3EB2639b2326fF937D041292dA2e79aDBbf'
-BOB_ADDRESS = '0x00Ce20EC71942B41F50fF566287B811bbef46DC8'
-ALICE_ADDRESS = '0x9f348cdD00dcD61EE7917695D2157ef6af2d7b9B'
-OWNER_ADDRESS = '0x3226C9EaC0379F04Ba2b1E1e1fcD52ac26309aeA'
-
-carl = accounts.at(CARL_ADDRESS, force=True)
-bob = accounts.at(BOB_ADDRESS, force=True)
-alice = accounts.at(ALICE_ADDRESS, force=True)
-owner = accounts.at(OWNER_ADDRESS, force=True)
-
 oraclePrice = None
-
-wbtc = Contract.from_explorer("0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6")
-ethx = Contract.from_explorer("0x27e1e4e6bc79d93032abef01025811b7e4727e85")
-wbtcx = Contract.from_explorer("0x4086ebf75233e8492f1bcda41c7f2a8288c2fb92")
-usdcx = Contract.from_explorer("0xcaa7349cea390f89641fe306d93591f87595dc1f")
 
 appBalances = {
     'ethx': [],
@@ -57,67 +39,148 @@ appBalances = {
     'daix': [],
     'usdcx': [],
     'ric': [],
-}
+  }
 ownerBalances = {
     'ethx': [],
     'wbtcx': [],
     'daix': [],
     'usdcx': [],
     'ric': [],
-}
+  }
 aliceBalances = {
     'ethx': [],
     'wbtcx': [],
     'daix': [],
     'usdcx': [],
     'ric': [],
-}
+  }
 bobBalances = {
     'ethx': [],
     'wbtcx': [],
     'daix': [],
     'usdcx': [],
     'ric': [],
-}
+  }
 
-for i in range(len(names)):
-    u[names[i].lower()] = 
 
 @pytest.fixture(autouse=True)
 def isolation(fn_isolation):
     pass
 
-# def web3tx(fn, msg):
-#     def result():
-#         ...
-#     return result
+@pytest.fixture(scope="module", autouse=True)
+def before():
+    owner = accounts[0]
+    alice = accounts[1]
+    bob = accounts[2]
+    carl = accounts[3]
+    spender = accounts[4]
+
+    sf = MockSuperfluid.deploy({'from': owner})
+
+    mock_eth = MockERC20.deploy('name1', 'symbol1', {'from': owner})
+    ethx = MockSuperToken.deploy({'from': owner})
+    ethx.setInputToken(mock_eth.address)
+
+    mock_wbtc = MockERC20.deploy('name2', 'symbol2', {'from': owner})
+    wbtcx = MockSuperToken.deploy({'from': owner})
+    wbtcx.setInputToken(mock_wbtc.address)
+
+    mock_daix = MockERC20.deploy('name3', 'symbol3', {'from': owner})
+    daix = MockSuperToken.deploy({'from': owner})
+    daix.setInputToken(mock_daix.address)
+
+    mock_usdcx = MockERC20.deploy('name4', 'symbol4', {'from': owner})
+    usdcx = MockSuperToken.deploy({'from': owner})
+    usdcx.setInputToken(mock_usdcx.address)
+
+    #tp = TellorPlayground()
+
+
+def createSFRegistrationKey(sf, deployer):
+    registrationKey = 'testKey-{}'.format(datetime.now())
+    appKey = Web3.sha3(
+        Web3.solidityKeccak(
+            ['string','address','string'],
+            [
+                'org.superfluid-finance.superfluid.appWhiteListing.registrationKey',
+                owner,
+                registrationKey,
+            ]
+        )
+    )
+    governance = SF_HOST.getGovernance.call()
+    print('SF Governance:', governance)
+    sfGovernanceRo = Contract.from_abi(str(governance), SuperfluidGovernanceBase.abi)
+    govOwner = sfGovernanceRo.owner()
+    #impersonateAndSetBalance(govOwner)
+    owner.transfer(govOwner, "10 ether")  #for initialization
+    sfGovernance = Contract.from_abi(str(governance), SuperfluidGovernanceBase.abi, {'from': govOwner})
+    sfGovernance.whiteListNewApp(SF_HOST.address, appKey)
+    return registrationKey
 
 # def approveSubscriprions(users = [alice, bob, owner], tokens = [wbtcx, ricAddress]): # [accounts[1].address, accounts[2].address, accounts[0].address]
 #     print('Approving subscriptions...')
-#     sf = Contract.from_explorer(SF_HOST)
+#
 #     for tokenIndex in range(0, len(tokens) - 1):
 #         for userIndex in range(0, len(users) - 1):
 #             index = 0
 #             if (tokens[tokenIndex] == ricAddress):
 #                 index = 1
-#             sf.agreements.ida =
-#             sf.callAgreement()
-#             await web3tx(
-#               sf.host.callAgreement,
-#               `${users[userIndex]} approves subscription to the app ${tokens[tokenIndex]} ${index}`,
-#             )(
-#               sf.agreements.ida.address,
-#               sf.agreements.ida.contract.methods
-#                 .approveSubscription(tokens[tokenIndex], app.address, tokenIndex, '0x')
-#                 .encodeABI(),
-#               '0x', # user data
-#               {
-#                 from: users[userIndex],
-#               },
-#             );
+#
+#             # await web3tx(
+#             #   sf.host.callAgreement,
+#             #   `${users[userIndex]} approves subscription to the app ${tokens[tokenIndex]} ${index}`,
+#             # )(
+#             #   sf.agreements.ida.address,
+#             #   sf.agreements.ida.contract.methods
+#             #     .approveSubscription(tokens[tokenIndex], app.address, tokenIndex, '0x')
+#             #     .encodeABI(),
+#             #   '0x', // user data
+#             #   {
+#             #     from: users[userIndex],
+#             #   },
+#             # );
 #             #web3tx?
 #     # contract_instance = Contract.at('0x3E14dC1b13c488a8d5D310918780c983bD5982E7')
 #
+def beforeEach():
+    sed = StreamExchangeHelper.deploy({'from': owner})
+    registrationKey = createSFRegistrationKey(sf, owner)
+
+    app = StreamExchange.deploy(
+        "0x3D7CD28EfD08FfE9Ce8cA329EC2e67822C756526",
+        "0xF4C5310E51F6079F601a5fb7120bC72a70b96e2A",
+        "0x32E0ecb72C1dDD92B007405F8102c1556624264D",
+        usdcx.address,
+        wbtcx.address,
+        "0x369A77c1A8A38488cc28C2FaF81D2378B9321D8B",
+        "0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff",
+        "0xACC2d27400029904919ea54fFc0b18Bf07C57875",
+        "60",
+        registrationKey,
+        {'from': owner}
+    )
+
+def test_fuck():
+    pass
+
+# def checkBalance(user):
+#     print('Balance of ', user.address)
+#     print('usdcx: ', str(usdcx.balanceOf(user.address)))
+#     print('wbtcx: ', str(wbtcx.balanceOf(user.address)))
+#
+# def checkBalances(accountsArray):
+#     for i in range(0, len(accountsArray)):
+#         checkBalance(accountsArray[i])
+#
+# def delta(account, balances):
+#     length = len(balances.wbtcx)
+#     changeInOutToken = balances.wbtcx[length - 1] - balances.wbtcx[length - 2]
+#     changeInInToken = balances.usdcx[length - 1] - balances.usdcx[length - 2]
+#     print('Change in balances for ', account)
+#     print('Usdcx:', changeInInToken, 'Bal:', balances.usdcx[length - 1])
+#     print('Wbtcx:', changeInOutToken, 'Bal:', balances.wbtcx[length - 1])
+#     print('Exchange Rate:', changeInOutToken / changeInInToken)
 #
 # def takeMeasurements():
 #     appBalances.ethx.push(str(ethx.balanceOf(app.address)))
@@ -139,7 +202,6 @@ def isolation(fn_isolation):
 #     ownerBalances.ric.push(str(ric.balanceOf(owner.address)))
 #     aliceBalances.ric.push(str(ric.balanceOf(alice.address)))
 #     bobBalances.ric.push(str(ric.balanceOf(bob.address)))
-#
 #
 # def test_should_be_correctly_configured():
 #     assert (app.isAppJailed()) == False
