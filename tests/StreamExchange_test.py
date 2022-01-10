@@ -1,3 +1,7 @@
+########################
+# THIS TEST SCRIPT REQUIRES Superfluid JS-SDK translation
+########################
+
 from web3 import Web3
 # from brownie import StreamExchange, StreamExchangeHelper, ISuperfluid, accounts, Contract
 from brownie import accounts, network, Contract
