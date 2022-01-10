@@ -39,6 +39,8 @@ BOB_ADDRESS = '0x00Ce20EC71942B41F50fF566287B811bbef46DC8'
 ALICE_ADDRESS = '0x9f348cdD00dcD61EE7917695D2157ef6af2d7b9B'
 OWNER_ADDRESS = '0x3226C9EaC0379F04Ba2b1E1e1fcD52ac26309aeA'
 
+CFA_ADDRESS = ''
+
 carl = accounts.at(CARL_ADDRESS, force=True)
 bob = accounts.at(BOB_ADDRESS, force=True)
 alice = accounts.at(ALICE_ADDRESS, force=True)
@@ -80,8 +82,64 @@ bobBalances = {
     'ric': [],
 }
 
-for i in range(len(names)):
-    u[names[i].lower()] = 
+
+class CFA:
+
+
+    def __init__(self, superfluid, cfa):
+        self.superfluid = superfluid
+        self.cfa = cfa
+
+
+    def deleteFlow(self, superToken, sender, receiver, by, userData, onTransaction=lambda: pass):
+        resultingBy = by if by == None else sender
+        userData = userData if userData != None else "0x"
+        self.superfluid.callAgreement(
+            cfa.address,
+            cfa.encodeABI(fn_name="deleteFlow", args=[
+                superToken, sender, receiver, "0x"
+            ]),
+            userData,
+            {
+                "from": resultingBy
+            }
+        )
+
+
+    def sanitizeFlowInfo(self, flowInfo):
+        return {
+            'timestamp': flowInfo.times
+        }
+
+
+    def getFlow(self, superToken, sender, receiver):
+        result = self.cfa.getFlow(superToken, sender, receiver)
+        return self.sanitizeFlowInfo(result )
+
+
+    def updateFlow(self):
+        ...
+
+
+    def createFlow(self):
+        ...
+
+
+class User:
+
+
+    def __init__(self, cfa, address, token):
+        self.cfa = cfa
+        self.address = address
+        self.token = token
+
+
+    def flow(self, recipient, flowRate, options):
+        if flowRate == '0':
+            cfa.deleteFlow(options)
+
+# for i in range(len(names)):
+#     u[names[i].lower()] =
 
 @pytest.fixture(autouse=True)
 def isolation(fn_isolation):
