@@ -142,8 +142,6 @@ class User:
         if flowRate == '0':
             cfa.deleteFlow(options)
 
-# for i in range(len(names)):
-#     u[names[i].lower()] =
 
 @pytest.fixture(autouse=True)
 def isolation(fn_isolation):
@@ -162,7 +160,7 @@ def isolation(fn_isolation):
 #             index = 0
 #             if (tokens[tokenIndex] == ricAddress):
 #                 index = 1
-#             sf.agreements.ida =
+#             sf.agreements.ida = <initialize IDA contract>
 #             sf.callAgreement()
 #             await web3tx(
 #               sf.host.callAgreement,
